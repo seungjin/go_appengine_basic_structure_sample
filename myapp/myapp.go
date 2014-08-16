@@ -29,7 +29,7 @@ func call_cityweather(w http.ResponseWriter, r *http.Request) {
 
 	for _, city := range city_list {
 		weather_description, temp, temp_min, temp_max := cityweather.CityWeather(r, city)
-		fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, [Min:%.2f, Max:%.2f])", city, weather_description, temp, temp_min, temp_max)
+		fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp, temp_min, temp_max)
 	}
 
 }
