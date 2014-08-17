@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"appengine"
 	"appengine/urlfetch"
@@ -40,6 +41,7 @@ func CityWeather(r *http.Request, cityname string) (string, float32, float32, fl
 		panic(err)
 	}
 
+	time.Sleep(time.Second * 1)
 	return weather.Weather[0].Description, weather.Main.Temp, weather.Main.Temp_min, weather.Main.Temp_max
 }
 

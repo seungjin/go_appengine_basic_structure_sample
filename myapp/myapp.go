@@ -47,11 +47,14 @@ func call_cityweather2(w http.ResponseWriter, r *http.Request) {
 
 	city_list := []string{"seoul", "newyork", "beijing", "london"}
 
+	message1 := make(chan string)
+	message2 := make(chan []float32)
+
 	for _, city := range city_list {
 		//weather_description, temp, temp_min, temp_max := cityweather.CityWeather(r, city)
 		//fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp, temp_min, temp_max)
-		message1 := make(chan string)
-		message2 := make(chan []float32)
+		//message1 := make(chan string)
+		//message2 := make(chan []float32)
 		go cityweather2.CityWeather(r, message1, message2, city)
 		weather_description := <-message1
 		temp_info := <-message2

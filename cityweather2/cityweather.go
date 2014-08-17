@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"appengine"
 	"appengine/urlfetch"
@@ -47,6 +48,7 @@ func CityWeather(r *http.Request, message1 chan string, message2 chan []float32,
 			strconv.FormatFloat(float64(weather.Main.Temp_min), 'f', 2, 32),
 			strconv.FormatFloat(float64(weather.Main.Temp_max), 'f', 2, 32)}
 	*/
+	time.Sleep(time.Second * 1)
 	message1 <- weather.Weather[0].Description
 	message2 <- []float32{weather.Main.Temp, weather.Main.Temp_min, weather.Main.Temp_max}
 }
