@@ -47,24 +47,16 @@ func call_cityweather2(w http.ResponseWriter, r *http.Request) {
 
 	city_list := []string{"seoul", "newyork", "beijing", "london"}
 
-	message1 := make(chan string, 4)
-	message2 := make(chan []float32, 4)
+	message := make(chan []string, 4)
 
 	for _, city := range city_list {
-		//message1 := make(chan string)
-		//message2 := make(chan []float32)
-		go cityweather2.CityWeather(r, message1, message2, city)
-		//weather_description := <-message1
-		//temp_info := <-message2
-		//fmt.Fprintf(w, <-message1)
-		//fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp_info[0], temp_info[1], temp_info[2])
+		go cityweather2.CityWeather(r, message, city)
 	}
 
-	for _, city := range city_list {
+	for i := 0; i < 5; i++ {
 		select {
-		case weather_description := <-message1:
-			temp_info := <-message2
-			fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp_info[0], temp_info[1], temp_info[2])
+		case weather := <-message:
+			fmt.Fprintf(w, "<li> %s: %s (Temp: %s, Min:%s/Max:%s)", weather[0], weather[1], weather[2], weather[3], weather[4])
 		case <-time.After(time.Second * 2):
 			fmt.Fprintf(w, "Timeout!")
 		}

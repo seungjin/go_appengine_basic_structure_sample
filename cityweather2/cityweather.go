@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"appengine"
@@ -30,7 +31,7 @@ type Weather struct {
 	Description string
 }
 
-func CityWeather(r *http.Request, message1 chan string, message2 chan []float32, cityname string) {
+func CityWeather(r *http.Request, message chan []string, cityname string) {
 
 	weather_info := openweather_request(r, cityname)
 	weather := &Response{}
@@ -38,16 +39,13 @@ func CityWeather(r *http.Request, message1 chan string, message2 chan []float32,
 	if err != nil {
 		panic(err)
 	}
-	//return weather.Weather[0].Description, weather.Main.Temp, weather.Main.Temp_min, weather.Main.Temp_max
-	/*
-		messages <- []string{weather.Weather[0].Description,
-			strconv.FormatFloat(float64(weather.Main.Temp), 'f', 2, 32),
-			strconv.FormatFloat(float64(weather.Main.Temp_min), 'f', 2, 32),
-			strconv.FormatFloat(float64(weather.Main.Temp_max), 'f', 2, 32)}
-	*/
+	message <- []string{
+		weather.Name,
+		weather.Weather[0].Description,
+		strconv.FormatFloat(float64(weather.Main.Temp), 'f', 2, 32),
+		strconv.FormatFloat(float64(weather.Main.Temp_min), 'f', 2, 32),
+		strconv.FormatFloat(float64(weather.Main.Temp_max), 'f', 2, 32)}
 	time.Sleep(time.Second * 1)
-	message1 <- weather.Weather[0].Description
-	message2 <- []float32{weather.Main.Temp, weather.Main.Temp_min, weather.Main.Temp_max}
 }
 
 //http://api.openweathermap.org/data/2.5/weather?q=
