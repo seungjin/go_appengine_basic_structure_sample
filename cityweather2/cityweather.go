@@ -33,14 +33,11 @@ type Weather struct {
 func CityWeather(r *http.Request, message1 chan string, message2 chan []float32, cityname string) {
 
 	weather_info := openweather_request(r, cityname)
-
 	weather := &Response{}
-
 	err := json.Unmarshal(weather_info, &weather)
 	if err != nil {
 		panic(err)
 	}
-
 	//return weather.Weather[0].Description, weather.Main.Temp, weather.Main.Temp_min, weather.Main.Temp_max
 	/*
 		messages <- []string{weather.Weather[0].Description,

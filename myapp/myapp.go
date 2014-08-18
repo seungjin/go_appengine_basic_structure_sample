@@ -47,20 +47,31 @@ func call_cityweather2(w http.ResponseWriter, r *http.Request) {
 
 	city_list := []string{"seoul", "newyork", "beijing", "london"}
 
-	message1 := make(chan string)
-	message2 := make(chan []float32)
+	message1 := make(chan string, 4)
+	message2 := make(chan []float32, 4)
 
 	for _, city := range city_list {
-		//weather_description, temp, temp_min, temp_max := cityweather.CityWeather(r, city)
-		//fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp, temp_min, temp_max)
 		//message1 := make(chan string)
 		//message2 := make(chan []float32)
 		go cityweather2.CityWeather(r, message1, message2, city)
-		weather_description := <-message1
-		temp_info := <-message2
-		//fmt.Fprintf(w, "<li> %s: %s (Temp: %s, Min:%s/Max:%s)", city, weather_info[0], weather_info[1], weather_info[2], weather_info[3])
-		fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp_info[0], temp_info[1], temp_info[2])
+		//weather_description := <-message1
+		//temp_info := <-message2
+		//fmt.Fprintf(w, <-message1)
+		//fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp_info[0], temp_info[1], temp_info[2])
 	}
+
+	for _, city := range city_list {
+		select {
+		case weather_description := <-message1:
+			temp_info := <-message2
+			fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp_info[0], temp_info[1], temp_info[2])
+		case <-time.After(time.Second * 2):
+			fmt.Fprintf(w, "Timeout!")
+		}
+	}
+
+	//close(message1)
+	//close(message2)
 
 	now2 := time.Now().UnixNano()
 	fmt.Fprintf(w, "<br/><br/>> %d", now2-now1)
