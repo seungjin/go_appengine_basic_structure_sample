@@ -30,7 +30,7 @@ func call_cityweather(w http.ResponseWriter, r *http.Request) {
 	now1 := time.Now().UnixNano()
 	fmt.Fprint(w, "<p>City Weather</p>")
 
-	city_list := []string{"seoul", "newyork", "beijing", "london"}
+	city_list := []string{"Seoul", "New York", "Beijing", "London"}
 
 	for _, city := range city_list {
 		weather_description, temp, temp_min, temp_max := cityweather.CityWeather(r, city)
@@ -45,9 +45,9 @@ func call_cityweather2(w http.ResponseWriter, r *http.Request) {
 	now1 := time.Now().UnixNano()
 	fmt.Fprint(w, "<p>City Weather</p>")
 
-	city_list := []string{"seoul", "newyork", "beijing", "london"}
+	city_list := []string{"Seoul", "New York", "Beijing", "London"}
 
-	message := make(chan []string, 4)
+	message := make(chan []byte, 4)
 
 	for _, city := range city_list {
 		go cityweather2.CityWeather(r, message, city)
@@ -56,9 +56,10 @@ func call_cityweather2(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < 5; i++ {
 		select {
 		case weather := <-message:
-			fmt.Fprintf(w, "<li> %s: %s (Temp: %s, Min:%s/Max:%s)", weather[0], weather[1], weather[2], weather[3], weather[4])
-		case <-time.After(time.Second * 2):
-			fmt.Fprintf(w, "Timeout!")
+			city, weather_description, temp, temp_min, temp_max := cityweather2.Weather_json_parser(weather)
+			fmt.Fprintf(w, "<li> %s: %s (Temp: %.2f, Min:%.2f/Max:%.2f)", city, weather_description, temp, temp_min, temp_max)
+		case <-time.After(time.Second * 1):
+			//fmt.Fprintf(w, "<br/><br/><b>Done</b>")
 		}
 	}
 
